@@ -7,7 +7,9 @@ require_once __DIR__.'/../src/helpers.php';
 // вспомогательные классы для инкапсулирования логики
 require_once __DIR__ . '/../src/repositories/RecipientRepository.php';
 require_once __DIR__ . '/../src/repositories/MailerRepository.php';
+require_once __DIR__ . '/../src/repositories/SimpleQueue.php';
 require_once __DIR__ . '/../src/import/CsvImporter.php';
+require_once __DIR__ . '/../src/enums/StatusSendEnum.php';
 
 // Конфиг
 $config = require __DIR__.'/../src/config.php';
@@ -133,7 +135,39 @@ if ($method === 'GET' && $uri === '/api/mailers') {
     ]);
 }
 
+// поставка в очередь всех
+if ($method === 'POST' && preg_match('#^/api/mailers/(\d+)/enqueue$#', $uri, $m)) {
+    $mailer_id = (int)$m[1];
 
+    if (empty(new MailerRepository()->get($mailer_id))) {
+        respond_json(['error'=>'Mailer not found'],404); 
+    }
+
+    respond_json(['ok' => true,'total_in_queue' => new SimpleQueue()->enqueueAll($mailer_id)]);
+}
+
+// отправка всем кто в рассылке участвует
+if ($method === 'POST' && preg_match('#^/api/mailers/(\d+)/send$#', $uri, $m)) {
+    $mailer_id = (int)$m[1];
+    $limit = isset($_GET['limit']) && ctype_digit((string)$_GET['limit']) ? (int)$_GET['limit'] : 100;
+
+    if (empty(new MailerRepository()->get($mailer_id)))  {
+        respond_json(['error'=>'Mailer not found'],404);
+    }
+
+    respond_json(['marked_as_sent' => new SimpleQueue()->sendBatch($mailer_id, $limit)]);
+}
+
+// получение статистики
+if ($method === 'GET' && preg_match('#^/api/mailers/(\d+)/status$#', $uri, $m)) {
+    $mailer_id = (int)$m[1];
+
+    if (empty(new MailerRepository()->get($mailer_id)))  {
+        respond_json(['error'=>'Mailer not found'],404);
+    }
+
+    respond_json(new SimpleQueue()->status($mailer_id));
+}
 
 /* Not found */
-respond_json(['answer' => 'error'], 404);
+respond_json(['answer' => 'No exist route'], 404);
