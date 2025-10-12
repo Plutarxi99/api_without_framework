@@ -25,18 +25,22 @@ class RecipientRepository {
 
         $place = [];
         $vals = [];
+
         foreach ($rows as $r) {
-            $place[] = "(?, ?)";
-            try {
+            if (
+                    array_key_exists('phone', $r) ||
+                    array_key_exists('email', $r)
+            ) {
+                $place[] = "(?, ?)";
                 $vals[] = $r['phone'];
                 $vals[] = $r['name'];
-            } catch (PDOException $e) {
-
             }
         }
+
         $sql = "INSERT IGNORE INTO recipients (phone, name) VALUES " . implode(',', $place);
         $stmt = $this->pdo->prepare($sql);
         $stmt->execute($vals);
+
         return $stmt->rowCount();
     }
 }
