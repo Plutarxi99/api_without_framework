@@ -31,5 +31,4 @@ if ($method === 'POST' && $uri === 'api/upload') {
 }
 
 /* Not found */
-header("HTTP/1.1 404 Not Found");
-echo "Not Found\n";
+respond_json(['answer' => 'error'], 404);
