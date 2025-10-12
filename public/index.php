@@ -6,6 +6,7 @@ require_once __DIR__.'/../src/helpers.php';
 
 // вспомогательные классы для инкапсулирования логики
 require_once __DIR__ . '/../src/repositories/RecipientRepository.php';
+require_once __DIR__ . '/../src/repositories/MailerRepository.php';
 require_once __DIR__ . '/../src/import/CsvImporter.php';
 
 // Конфиг
@@ -30,6 +31,7 @@ if ($method === 'GET' && $uri === '/test') {
     respond_json(['answer' => 'test']);
 }
 
+// загрузить
 if ($method === 'POST' && $uri === '/api/upload') {
     // если файла не существует даем ошибку
     if (! isset($_FILES['file'])) {
@@ -54,6 +56,45 @@ if ($method === 'POST' && $uri === '/api/upload') {
             new CsvImporter()->importFile($storage)
         ]
     );
+}
+
+// создать рассылку
+if ($method === 'POST' && $uri === '/api/mailers') {
+    if (is_null($data = getJsonBody())) {
+        respond_json(['error' => 'Bad request'], 404);
+    }
+
+    if (
+            ! array_key_exists('title', $data) ||
+            ! array_key_exists('body', $data)
+    ) {
+        respond_json(['error' => 'POST body empty or no key in array'], 404);
+    }
+    try {
+        $mailer_id = new MailerRepository()->create($data['title'], $data['body']);
+    } catch (Exception) {
+        respond_json(['error' => 'failed create mailer'], 500);
+    }
+
+    respond_json(
+        new MailerRepository()->get($mailer_id)
+    );
+}
+
+// получить рассылку по ID
+if ($method === 'GET' && preg_match('#^/api/mailers/(\d+)$#', $uri, $mailer_id)) {
+    $mailer = new MailerRepository()->get($mailer_id[1]);
+
+    if (empty($mailer)) {
+        respond_json(['error' => 'mailer not found'], 404);
+    }
+
+    respond_json($mailer);
+}
+
+//получить все рассылки
+if ($method === 'GET' && $uri === '/api/mailers') {
+    respond_json(new MailerRepository()->getAll());
 }
 
 /* Not found */
