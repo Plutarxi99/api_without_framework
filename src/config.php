@@ -6,5 +6,4 @@ return [
     'user' => 'mailuser',
     'pass' => 'password',
     'uploadDir' => __DIR__ . '/../storage/uploads',
-    'batchSize' => 500,
 ];

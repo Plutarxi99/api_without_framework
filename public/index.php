@@ -1,11 +1,11 @@
 <?php
 
 // Подключаем автозагрузку/классы вручную
-require_once __DIR__.'/src/db.php';
-require_once __DIR__.'/src/helpers.php';
+require_once __DIR__.'/../src/db.php';
+require_once __DIR__.'/../src/helpers.php';
 
 // Конфиг
-$config = require __DIR__.'/src/config.php';
+$config = require __DIR__.'/../src/config.php';
 
 // Получаем метод и uri
 $method = $_SERVER['REQUEST_METHOD'];
@@ -21,8 +21,13 @@ function getJsonBody(): mixed
     $body = file_get_contents('php://input');
     return $body ? json_decode($body, true) : null;
 }
-
+var_dump(getJsonBody());
 if ($method === 'GET' && $uri === '/test') {
+    var_dump($_GET);
+    respond_json(['answer' => 'test']);
+}
+
+if ($method === 'POST' && $uri === 'api/upload') {
     header("HTTP/1.1 200 qwfqwf");
     var_dump(1);
 }
