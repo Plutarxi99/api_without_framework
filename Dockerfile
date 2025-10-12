@@ -6,6 +6,7 @@ RUN apt-get update \
  && apt-get install -y --no-install-recommends \
       default-libmysqlclient-dev \
  && docker-php-ext-install pdo_mysql \
+&& rm -rf /var/lib/apt/lists/*
 
 # Установим рабочую директорию (где лежит public/)
 WORKDIR /var/www/html
