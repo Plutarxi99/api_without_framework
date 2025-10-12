@@ -5,5 +5,5 @@ return [
     'dsn' => 'mysql:host=db;post=3306;dbname=mailing;charset=utf8mb4',
     'user' => 'mailuser',
     'pass' => 'password',
-    'uploadDir' => __DIR__ . '/../storage/uploads',
+    'upload_dir' => __DIR__ . '/../storage/files',
 ];
