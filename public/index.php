@@ -6,6 +6,7 @@ require_once __DIR__.'/../src/helpers.php';
 
 // вспомогательные классы для инкапсулирования логики
 require_once __DIR__ . '/../src/repositories/RecipientRepository.php';
+require_once __DIR__ . '/../src/import/CsvImporter.php';
 
 // Конфиг
 $config = require __DIR__.'/../src/config.php';
@@ -42,14 +43,17 @@ if ($method === 'POST' && $uri === '/api/upload') {
     }
 
     $storage = $config['upload_dir'] . '/' . uniqid('csv_', true) . '.csv';;
-    // загружаем файл на север
+    // загружаем файл на сервер
     if (! move_uploaded_file($f['tmp_name'], $storage)) {
         respond_json(['error' => 'Cannot save uploaded file'], 500);
     }
-    $repo = new RecipientRepository();
-    var_dump($repo);
 
-    respond_json(['answer' => 'upload']);
+    respond_json(
+        [
+            'answer' => 'upload',
+            new CsvImporter()->importFile($storage)
+        ]
+    );
 }
 
 /* Not found */
