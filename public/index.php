@@ -21,15 +21,13 @@ function getJsonBody(): mixed
     $body = file_get_contents('php://input');
     return $body ? json_decode($body, true) : null;
 }
-var_dump(getJsonBody());
+
 if ($method === 'GET' && $uri === '/test') {
-    var_dump($_GET);
     respond_json(['answer' => 'test']);
 }
 
 if ($method === 'POST' && $uri === 'api/upload') {
     header("HTTP/1.1 200 qwfqwf");
-    var_dump(1);
 }
 
 /* Not found */
