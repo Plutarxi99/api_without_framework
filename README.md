@@ -68,12 +68,7 @@ docker-compose up -d --build
 
 2. Создать/обновить таблицы:
 ```bash
-docker exec -it mailing-api php migrate.php
-```
-
-3. Проверить логи:
-```bash
-docker exec -it mailing-api tail -n 200 /var/log/apache2/error.log
+docker compose exec api sh -c "php migrate.php"
 ```
 
 DB настройки (по умолчанию в `docker-compose.yml`):
