@@ -94,8 +94,46 @@ if ($method === 'GET' && preg_match('#^/api/mailers/(\d+)$#', $uri, $mailer_id))
 
 //получить все рассылки
 if ($method === 'GET' && $uri === '/api/mailers') {
-    respond_json(new MailerRepository()->getAll());
+    // Параметры запроса
+    $limit = isset($_GET['limit']) ? (int)$_GET['limit'] : 100;
+    $raw_page = isset($_GET['page']) ? (int)$_GET['page'] : null;
+    $raw_offset = isset($_GET['offset']) ? (int)$_GET['offset'] : null;
+
+    if ($limit > 100 || $limit < 0) {
+        respond_json(['error' => 'limit exceeded'], 400);
+    }
+
+    if (! is_null($raw_page) && $raw_page > 0) {
+        $page = $raw_page;
+        $offset = ($page - 1) * $limit;
+    } elseif (! is_null($raw_offset) && $raw_offset >= 0) {
+        $offset = $raw_offset;
+        $page = (int) floor($offset / $limit) + 1;
+    } else {
+        $page = 1;
+        $offset = 0;
+    }
+
+    // Получаем данные
+    $repo = new MailerRepository();
+    $total = $repo->count();
+    $items = $repo->getAll($limit, $offset);
+
+    $pages = $limit > 0 ? (int)ceil($total / $limit) : 1;
+
+    respond_json([
+        'data' => $items,
+        'meta' => [
+            'total' => $total,
+            'per_page' => $limit,
+            'page' => $page,
+            'pages' => $pages,
+            'offset' => $offset
+        ]
+    ]);
 }
+
+
 
 /* Not found */
 respond_json(['answer' => 'error'], 404);

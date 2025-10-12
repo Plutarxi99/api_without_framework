@@ -68,4 +68,11 @@ class MailerRepository
         $stmt->execute();
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
+
+    public function count(): int
+    {
+        $stmt = $this->pdo->prepare("SELECT COUNT(*) FROM mailers");
+        $stmt->execute();
+        return $stmt->fetchColumn();
+    }
 }
