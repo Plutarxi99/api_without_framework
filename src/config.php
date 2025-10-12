@@ -1,9 +1,10 @@
 <?php
 
 return [
-    'dsn' => 'mysql:host=127.0.0.1;dbname=mailing;charset=utf8mb4',
-    'user' => 'root',
-    'pass' => '',
+    // DSN для MySQL
+    'dsn' => 'mysql:host=db;post=3306;dbname=mailing;charset=utf8mb4',
+    'user' => 'mailuser',
+    'pass' => 'password',
     'uploadDir' => __DIR__ . '/../storage/uploads',
     'batchSize' => 500,
 ];
