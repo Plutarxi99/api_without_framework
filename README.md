@@ -119,13 +119,11 @@ GET /api/mailers/{id}
 ```
 POST /api/mailers/{id}/enqueue
 ```
-Действие: `INSERT IGNORE INTO mailer_queue (mailer_id, recipient_id) SELECT ?, id FROM recipients`
 
 ### Фейковая отправка (пометить N как отправленные)
 ```
 POST /api/mailers/{id}/send?limit=100
 ```
-Действие: `UPDATE mailer_queue SET status = 2, last_attempt_at = NOW() WHERE mailer_id = ? AND status = 0 LIMIT N`
 
 ### Статус рассылки
 ```
